@@ -19452,3 +19452,97 @@
 2022-09-15 04:44:24,325 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
 2022-09-15 04:44:26,329 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
 2022-09-15 04:44:28,333 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:44:30,338 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:44:32,341 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:44:34,344 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:44:36,347 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:44:37,332 DEBUG   HandlerThread:17953 [handler.py:handle_request():130] handle_request: stop_status
+2022-09-15 04:44:37,333 DEBUG   SenderThread:17953 [sender.py:send_request():248] send_request: stop_status
+2022-09-15 04:44:38,350 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:44:40,354 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:44:42,358 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:44:44,361 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:44:46,365 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:44:48,368 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:44:50,371 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:44:52,071 DEBUG   SenderThread:17953 [sender.py:send():234] send: stats
+2022-09-15 04:44:52,375 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:44:52,660 DEBUG   HandlerThread:17953 [handler.py:handle_request():130] handle_request: stop_status
+2022-09-15 04:44:52,661 DEBUG   SenderThread:17953 [sender.py:send_request():248] send_request: stop_status
+2022-09-15 04:44:54,380 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:44:56,385 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:44:58,388 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:00,393 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:02,399 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:04,405 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:06,409 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:07,989 DEBUG   HandlerThread:17953 [handler.py:handle_request():130] handle_request: stop_status
+2022-09-15 04:45:07,989 DEBUG   SenderThread:17953 [sender.py:send_request():248] send_request: stop_status
+2022-09-15 04:45:08,412 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:10,415 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:12,419 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:14,422 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:16,425 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:18,428 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:20,432 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:22,364 DEBUG   SenderThread:17953 [sender.py:send():234] send: stats
+2022-09-15 04:45:22,436 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:23,319 DEBUG   HandlerThread:17953 [handler.py:handle_request():130] handle_request: stop_status
+2022-09-15 04:45:23,319 DEBUG   SenderThread:17953 [sender.py:send_request():248] send_request: stop_status
+2022-09-15 04:45:24,439 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:26,442 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:28,448 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:30,451 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:32,455 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:34,458 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:36,460 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:38,463 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:38,649 DEBUG   HandlerThread:17953 [handler.py:handle_request():130] handle_request: stop_status
+2022-09-15 04:45:38,649 DEBUG   SenderThread:17953 [sender.py:send_request():248] send_request: stop_status
+2022-09-15 04:45:40,468 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:42,471 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:44,473 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:46,476 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:48,480 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:50,484 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:52,487 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:52,638 DEBUG   SenderThread:17953 [sender.py:send():234] send: stats
+2022-09-15 04:45:53,975 DEBUG   HandlerThread:17953 [handler.py:handle_request():130] handle_request: stop_status
+2022-09-15 04:45:53,975 DEBUG   SenderThread:17953 [sender.py:send_request():248] send_request: stop_status
+2022-09-15 04:45:54,491 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:56,495 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:45:58,497 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:46:00,502 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:46:02,506 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:46:04,510 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:46:06,513 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:46:08,516 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:46:09,303 DEBUG   HandlerThread:17953 [handler.py:handle_request():130] handle_request: stop_status
+2022-09-15 04:46:09,303 DEBUG   SenderThread:17953 [sender.py:send_request():248] send_request: stop_status
+2022-09-15 04:46:10,519 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:46:12,523 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:46:14,525 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:46:16,529 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:46:18,532 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:46:20,536 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:46:22,540 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:46:22,926 DEBUG   SenderThread:17953 [sender.py:send():234] send: stats
+2022-09-15 04:46:24,546 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:46:24,635 DEBUG   HandlerThread:17953 [handler.py:handle_request():130] handle_request: stop_status
+2022-09-15 04:46:24,636 DEBUG   SenderThread:17953 [sender.py:send_request():248] send_request: stop_status
+2022-09-15 04:46:26,550 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:46:28,553 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:46:30,556 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:46:32,559 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:46:34,564 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:46:36,567 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:46:38,571 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:46:39,973 DEBUG   HandlerThread:17953 [handler.py:handle_request():130] handle_request: stop_status
+2022-09-15 04:46:39,974 DEBUG   SenderThread:17953 [sender.py:send_request():248] send_request: stop_status
+2022-09-15 04:46:40,575 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:46:42,577 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:46:44,580 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:46:46,582 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:46:48,586 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:46:50,590 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
+2022-09-15 04:46:52,593 INFO    Thread-8  :17953 [dir_watcher.py:_on_file_modified():230] file/dir modified: /home/vamsi81523/surr_exps/surr_independent_mid/wandb/run-20220914_204248-1q2tlwrs/files/output.log
