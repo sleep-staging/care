@@ -1,4 +1,4 @@
-import os
+import os, shutil
 import torch
 import numpy as np
 import argparse
@@ -16,8 +16,13 @@ parser.add_argument("--dir", type=str, default="/scratch/shhs_outputs",
 
 args = parser.parse_args()
 
-dire = '/scratch/new_shhs/'
+dire = '/scratch/new_shhs'
 data_dir = os.path.join(dire, "shhs_outputs")    #on gnode27 = "numpy_subjects"
+
+if not os.path.exists(dire):
+    os.makedirs(dire, exist_ok=True)
+    
+shutil.copytree(args.dir, data_dir)
 
 files = os.listdir(data_dir)
 files = np.array([os.path.join(data_dir, i) for i in files])
