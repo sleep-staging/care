@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 from config import Config
 from utils.utils import *
 
-SEED = 123
+SEED = 1234
 torch.manual_seed(SEED)
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
@@ -23,7 +23,7 @@ parser.add_argument("--name",
 parser.add_argument(
     "--data_dir",
     type=str,
-    default="/scratch/sleepkfold_allsamples",
+    default="/scratch/new_shhs",
     help="Path to the data",
 )
 parser.add_argument("--save_path",
@@ -44,9 +44,12 @@ ss_wandb = wandb.init(
 config = Config(ss_wandb)
 
 config.src_path = args.data_dir
-config.exp_path = args.save_path
+config.exp_path = os.path.join(args.save_path, name)
 
-config.le_path = "/scratch/new_shhs/test"
+if not os.path.exists(config.exp_path):
+    os.makedirs(config.exp_path, exist_ok=True)
+
+config.le_path = "/scratch/sleepkfold_allsamples/test"
 
 ss_wandb.save("./config.py")
 ss_wandb.save("./trainer.py")

@@ -5,7 +5,8 @@ import torch.nn as nn
 import numpy as np
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from config import Config
-from torchmetrics.functional import accuracy, f1, cohen_kappa
+from torchmetrics.functional import accuracy, cohen_kappa
+from torchmetrics.functional import f1_score as f1
 from models.model import contrast_loss, ft_loss
 from sklearn.metrics import balanced_accuracy_score
 from data_preprocessing.dataloader import TuneDataset

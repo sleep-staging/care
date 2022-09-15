@@ -83,7 +83,7 @@ class sleep_pretrain(nn.Module):
         )
         return None
 
-    def ft_fun(self, epoch, test_subjects_train, test_subjects_test):
+    def ft_fun(self, test_subjects_train, test_subjects_test):
 
         train_dl = DataLoader(
             TuneDataset(test_subjects_train),
@@ -101,7 +101,6 @@ class sleep_pretrain(nn.Module):
             self.config,
             train_dl,
             test_dl,
-            epoch,
             self.loggr,
         )
         f1, kappa, bal_acc, acc = sleep_eval.fit()
@@ -115,9 +114,9 @@ class sleep_pretrain(nn.Module):
                       random_state=1234)
 
         k_acc, k_f1, k_kappa, k_bal_acc = 0, 0, 0, 0
-        i = 1
         start = time.time()
-
+        
+        i = 0
         for train_idx, test_idx in kfold.split(self.test_subjects):
 
             test_subjects_train = [self.test_subjects[i] for i in train_idx]
@@ -128,17 +127,16 @@ class sleep_pretrain(nn.Module):
             test_subjects_test = [
                 rec for sub in test_subjects_test for rec in sub
             ]
-
-            print(f"Split {i}")
-            f1, kappa, bal_acc, acc = self.ft_fun(self.name, 0,
-                                                  test_subjects_train,
-                                                  test_subjects_test, i)
+            
+            i+=1
+            print(f'Fold: {i}')
+            
+            f1, kappa, bal_acc, acc = self.ft_fun(test_subjects_train, test_subjects_test)
             k_f1 += f1
             k_kappa += kappa
             k_bal_acc += bal_acc
             k_acc += acc
-
-            i += 1
+      
         pit = time.time() - start
         print(f"Took {int(pit // 60)} min:{int(pit % 60)} secs")
 
@@ -153,23 +151,15 @@ class sleep_pretrain(nn.Module):
 
         epoch_loss = 0
         scaler = GradScaler()
+        
         for epoch in range(self.epochs):
-
-            print(
-                "=========================================================================================================================\n"
-            )
-            print("Epoch: {}".format(epoch))
-            print(
-                "=========================================================================================================================\n"
-            )
-
             self.current_epoch = epoch
             outputs = {
                 "loss": [],
             }
 
             self.model.train()
-            for batch_idx, batch in tqdm(enumerate(self.dataloader)):
+            for batch_idx, batch in tqdm(enumerate(self.dataloader), desc="Pretraining", total=len(self.dataloader)):
 
                 with torch.cuda.amp.autocast():
                     loss = self.training_step(batch, batch_idx)
@@ -181,10 +171,12 @@ class sleep_pretrain(nn.Module):
 
                 outputs["loss"].append(loss.item())
 
-            print(
-                f"Pretrain Epoch: {epoch} Loss: {epoch_loss:.6g} Batch Loss: {loss.item():.6g}"
-            )
             epoch_loss = self.training_epoch_end(outputs)
+            
+            print('='*50, end = '\n')
+            print(f"Epoch: {epoch}, Loss: {epoch_loss}")
+            print('='*50, end = '\n')
+           
             self.on_epoch_end()
 
             # evaluation step
@@ -200,7 +192,6 @@ class sleep_pretrain(nn.Module):
                 print(f'F1: {f1} Kappa: {kappa} B.Acc: {bal_acc} Acc: {acc}')
 
                 if self.max_f1 < f1:
-                    cif self.max_f1 < f1:
                     chkpoint = {
                         'eeg_model_state_dict':
                         self.model.model.eeg_encoder.state_dict(),
@@ -218,11 +209,11 @@ class sleep_pretrain(nn.Module):
                         os.path.join(self.config.exp_path, self.name + f'_best.pt'))
                     self.max_f1 = f1
 
+                    
 
 class sleep_ft(nn.Module):
 
-    def __init__(self, chkpoint_pth, config, train_dl, valid_dl, pret_epoch,
-                 wandb_logger):
+    def __init__(self, chkpoint_pth, config, train_dl, valid_dl, wandb_logger):
         super(sleep_ft, self).__init__()
         self.device = torch.device(
             "cuda" if torch.cuda.is_available() else "cpu")
@@ -231,12 +222,11 @@ class sleep_ft(nn.Module):
         self.beta1 = config.beta1
         self.beta2 = config.beta2
         self.weight_decay = 3e-5
-        self.batch_size = config.batch_size
+        self.batch_size = config.eval_batch_size
         self.loggr = wandb_logger
         self.criterion = nn.CrossEntropyLoss()
         self.train_ft_dl = train_dl
         self.valid_ft_dl = valid_dl
-        self.pret_epoch = pret_epoch
         self.eval_es = config.eval_early_stopping
 
         self.best_loss = torch.tensor(math.inf).to(self.device)
@@ -312,7 +302,7 @@ class sleep_ft(nn.Module):
 
     def fit(self):
 
-        for ep in tqdm(range(self.ft_epoch), desc="Evaluation"):
+        for ep in tqdm(range(self.ft_epoch), desc="Linear Evaluation"):
 
             # Training Loop
             self.model.train()

@@ -5,7 +5,7 @@ class Config(object):
 
     def __init__(self, wandb=None):
 
-        self.src_path = "/scratch/SLEEP_data/"
+        self.src_path = "/scratch/sleepkfold_allsamples/"
         self.exp_path = "."
         self.wandb = wandb
         self.batch_size = 128

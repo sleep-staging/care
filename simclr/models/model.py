@@ -91,9 +91,9 @@ class projection_head(nn.Module):
         super(projection_head, self).__init__()
         self.config = config
         self.projection_head = nn.Sequential(
-            nn.Linear(input_dim, config.proj_dim, bias=True),
+            nn.Linear(input_dim, config.tc_hidden_dim, bias=True),
             nn.ReLU(inplace=True),
-            nn.Linear(config.proj_dim, config.proj_dim, bias=True),
+            nn.Linear(config.tc_hidden_dim, config.tc_hidden_dim, bias=True),
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
