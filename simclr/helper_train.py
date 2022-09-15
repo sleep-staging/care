@@ -238,11 +238,15 @@ class sleep_ft(nn.Module):
         self.train_ft_dl = train_dl
         self.valid_ft_dl = valid_dl
         self.pret_epoch = pret_epoch
-        self.max_f1 = torch.tensor(0)
+        self.eval_es = config.eval_early_stopping
 
-        self.max_acc = torch.tensor(0)
+        self.best_loss = torch.tensor(math.inf).to(self.device)
+        self.counter = torch.tensor(0).to(self.device)
+        self.max_f1 = torch.tensor(0).to(self.device)
+        self.max_acc = torch.tensor(0).to(self.device)
         self.max_bal_acc = torch.tensor(0)
-        self.max_kappa = torch.tensor(0)
+        self.max_kappa = torch.tensor(0).to(self.device)
+
         self.optimizer = torch.optim.Adam(
             self.model.parameters(),
             self.config.lr,
@@ -259,7 +263,7 @@ class sleep_ft(nn.Module):
 
     def training_step(self, batch, batch_idx):
         data, y = batch
-        data, y = data.float().to(self.device), y.to(self.device)
+        data, y = data.float().to(self.device), y.long().to(self.device)
         outs = self.model(data)
         loss = self.criterion(outs, y)
         return loss
@@ -301,19 +305,20 @@ class sleep_ft(nn.Module):
             self.max_bal_acc = bal_acc
             self.max_acc = epoch_acc
 
-        self.scheduler.step(epoch_loss)
+        return epoch_loss
 
     def on_train_end(self):
         return self.max_f1, self.max_kappa, self.max_bal_acc, self.max_acc
 
     def fit(self):
 
-        for ft_epoch in tqdm(range(self.ft_epoch), desc="Evaluation"):
+        for ep in tqdm(range(self.ft_epoch), desc="Evaluation"):
 
             # Training Loop
-
             self.model.train()
             ft_outputs = {"loss": [], "acc": [], "preds": [], "target": []}
+            outputs = {'loss': []}
+
             for ft_batch_idx, ft_batch in enumerate(self.train_ft_dl):
 
                 loss = self.training_step(ft_batch, ft_batch_idx)
@@ -321,6 +326,10 @@ class sleep_ft(nn.Module):
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()
+
+                outputs['loss'].append(loss.item())
+                loss = torch.hstack([torch.tensor(x)
+                                     for x in outputs['loss']]).mean()
 
             # Validation Loop
             self.model.eval()
@@ -338,10 +347,16 @@ class sleep_ft(nn.Module):
                     ft_outputs["preds"].append(preds)
                     ft_outputs["target"].append(target)
 
-                self.validation_epoch_end(ft_outputs)
-                print(
-                    f"FT Epoch: {ft_epoch} F1: {self.max_f1.item():.4g} Kappa: {self.max_kappa.item():.4g} B.Acc: {self.max_bal_acc.item():.4g} Acc: {self.max_acc.item():.4g}"
-                )
-                # self.loggr.log({'FT Epoch':ft_epoch,'Epoch':self.pret_epoch})
+                val_loss = self.validation_epoch_end(ft_outputs)
+
+            if val_loss + 0.001 < self.best_loss:
+                self.best_loss = val_loss
+                self.counter = 0
+            else:
+                self.counter += 1
+
+            if self.counter == self.eval_es:
+                print(f'Early stopped at {ep} epoch')
+                break
 
         return self.on_train_end()

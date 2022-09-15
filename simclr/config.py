@@ -42,7 +42,8 @@ class Config(object):
         # training and evaluation
         self.num_epoch = 200
         self.batch_size = 128
-        self.num_ft_epoch = 50
+        self.eval_early_stopping = 15
+        self.num_ft_epoch = 100
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.drop_last = True
         self.lambda1 = 1

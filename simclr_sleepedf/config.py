@@ -1,8 +1,9 @@
 import torch
 
+
 class Config(object):
 
-    def __init__(self,wandb=None):
+    def __init__(self, wandb=None):
 
         self.src_path = "/scratch/SLEEP_data/"
         self.exp_path = "."
@@ -13,7 +14,7 @@ class Config(object):
 
         self.degree = 0.05
         self.mask_max_points = 200
-        self.mask_min_points = 50 
+        self.mask_min_points = 50
 
         self.proj_dim = 128
 
