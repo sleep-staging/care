@@ -35,7 +35,7 @@ args = parser.parse_args()
 
 name = args.name
 ss_wandb = wandb.init(
-    project="surround project",
+    project="care baselines",
     name=name,
     notes="curr to curr loss",
     save_code=True,
@@ -88,5 +88,4 @@ model = sleep_pretrain(config, name, pretext_loader, test_subjects, ss_wandb)
 ss_wandb.watch([model], log="all", log_freq=500)
 
 model.fit()
-
 ss_wandb.finish()

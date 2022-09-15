@@ -14,7 +14,6 @@ class Config(object):
     def __init__(self, wandb=None) -> None:
 
         # path
-        self.src_path = os.path.join(os.getcwd(), "data")
         self.wandb = wandb
 
         # augmentation

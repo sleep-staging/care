@@ -83,8 +83,7 @@ class sleep_pretrain(nn.Module):
         )
         return None
 
-    def ft_fun(self, file_name, epoch, test_subjects_train, test_subjects_test,
-               split):
+    def ft_fun(self, epoch, test_subjects_train, test_subjects_test):
 
         train_dl = DataLoader(
             TuneDataset(test_subjects_train),
@@ -183,7 +182,7 @@ class sleep_pretrain(nn.Module):
                 outputs["loss"].append(loss.item())
 
             print(
-                f"Pretrain Epoch {epoch}: Prev.Epoch Loss {epoch_loss:.6g} Pretrain Batch Loss:{loss.item():.6g}"
+                f"Pretrain Epoch: {epoch} Loss: {epoch_loss:.6g} Batch Loss: {loss.item():.6g}"
             )
             epoch_loss = self.training_epoch_end(outputs)
             self.on_epoch_end()
@@ -191,33 +190,33 @@ class sleep_pretrain(nn.Module):
             # evaluation step
             if (epoch % 5 == 0) and (epoch > 60):
                 f1, kappa, bal_acc, acc = self.do_kfold()
+                self.loggr.log({
+                    'F1': f1,
+                    'Kappa': kappa,
+                    'Bal Acc': bal_acc,
+                    'Acc': acc,
+                    'Epoch': epoch
+                })
+                print(f'F1: {f1} Kappa: {kappa} B.Acc: {bal_acc} Acc: {acc}')
 
                 if self.max_f1 < f1:
+                    cif self.max_f1 < f1:
                     chkpoint = {
-                        "eeg_model_state_dict":
+                        'eeg_model_state_dict':
                         self.model.model.eeg_encoder.state_dict(),
-                        "best_pretrain_epoch":
+                        'best_pretrain_epoch':
                         epoch,
+                        'f1':
+                        f1
                     }
                     torch.save(
                         chkpoint,
                         os.path.join(self.config.exp_path,
                                      self.name + "_best.pt"),
                     )
-                    self.max_f1, self.max_kappa, self.max_bal_acc, self.max_acc = (
-                        f1,
-                        kappa,
-                        bal_acc,
-                        acc,
-                    )
-
-                self.loggr.log({
-                    "F1": f1,
-                    "Kappa": kappa,
-                    "Bal Acc": bal_acc,
-                    "Acc": acc,
-                    "Epoch": epoch,
-                })
+                    self.loggr.save(
+                        os.path.join(self.config.exp_path, self.name + f'_best.pt'))
+                    self.max_f1 = f1
 
 
 class sleep_ft(nn.Module):
@@ -275,7 +274,7 @@ class sleep_ft(nn.Module):
         loss = self.criterion(outs, y)
         acc = accuracy(outs, y)
         return {
-            "loss": loss,
+            "loss": loss.detach(),
             "acc": acc,
             "preds": outs.detach(),
             "target": y.detach()
@@ -285,7 +284,8 @@ class sleep_ft(nn.Module):
 
         epoch_preds = torch.vstack([x for x in outputs["preds"]])
         epoch_targets = torch.hstack([x for x in outputs["target"]])
-        epoch_loss = torch.hstack([x["loss"] for x in outputs]).mean()
+        epoch_loss = torch.hstack([torch.tensor(x)
+                                   for x in outputs['loss']]).mean()
         epoch_acc = torch.hstack([torch.tensor(x)
                                   for x in outputs["acc"]]).mean()
         class_preds = epoch_preds.cpu().detach().argmax(dim=1)
@@ -320,9 +320,7 @@ class sleep_ft(nn.Module):
             outputs = {'loss': []}
 
             for ft_batch_idx, ft_batch in enumerate(self.train_ft_dl):
-
                 loss = self.training_step(ft_batch, ft_batch_idx)
-
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()
