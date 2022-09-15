@@ -5,9 +5,12 @@ import torch
 # Convolution Function
 def conv3x3(in_planes, out_planes, stride=1):
     """3x3 convolution with padding"""
-    return nn.Conv1d(
-        in_planes, out_planes, kernel_size=7, stride=stride, padding=3, bias=False
-    )
+    return nn.Conv1d(in_planes,
+                     out_planes,
+                     kernel_size=7,
+                     stride=stride,
+                     padding=3,
+                     bias=False)
 
 
 # Basic Building Block
@@ -20,15 +23,19 @@ class BasicBlock_Bottle(nn.Module):
         self.bn1 = nn.BatchNorm1d(planes)
         self.relu = nn.ReLU(inplace=True)
         self.drop = nn.Dropout(p=0.2)
-        self.conv2 = nn.Conv1d(
-            planes, planes, kernel_size=25, stride=stride, padding=12, bias=False
-        )
+        self.conv2 = nn.Conv1d(planes,
+                               planes,
+                               kernel_size=25,
+                               stride=stride,
+                               padding=12,
+                               bias=False)
         self.bn2 = nn.BatchNorm1d(planes)
         self.downsample = downsample
         self.stride = stride
-        self.conv3 = nn.Conv1d(
-            planes, self.expansion * planes, kernel_size=1, bias=False
-        )  #
+        self.conv3 = nn.Conv1d(planes,
+                               self.expansion * planes,
+                               kernel_size=1,
+                               bias=False)  #
         self.bn3 = nn.BatchNorm1d(self.expansion * planes)
 
     def forward(self, x):
@@ -56,22 +63,38 @@ class BasicBlock_Bottle(nn.Module):
 
 # Main 1D-RESNET Model
 class BaseNet(nn.Module):
+
     def __init__(self, input_channels=1, layers=[3, 4, 6, 3]):
         self.inplanes3 = 16
 
         super(BaseNet, self).__init__()
 
-        self.conv1 = nn.Conv1d(
-            input_channels, 16, kernel_size=71, stride=2, padding=35, bias=False
-        )
+        self.conv1 = nn.Conv1d(input_channels,
+                               16,
+                               kernel_size=71,
+                               stride=2,
+                               padding=35,
+                               bias=False)
         self.bn1 = nn.BatchNorm1d(16)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool1d(kernel_size=71, stride=2, padding=35)
 
-        self.layer3x3_1 = self._make_layer3(BasicBlock_Bottle, 8, layers[0], stride=1)
-        self.layer3x3_2 = self._make_layer3(BasicBlock_Bottle, 16, layers[1], stride=2)
-        self.layer3x3_3 = self._make_layer3(BasicBlock_Bottle, 32, layers[2], stride=2)
-        self.layer3x3_4 = self._make_layer3(BasicBlock_Bottle, 64, layers[3], stride=2)
+        self.layer3x3_1 = self._make_layer3(BasicBlock_Bottle,
+                                            8,
+                                            layers[0],
+                                            stride=1)
+        self.layer3x3_2 = self._make_layer3(BasicBlock_Bottle,
+                                            16,
+                                            layers[1],
+                                            stride=2)
+        self.layer3x3_3 = self._make_layer3(BasicBlock_Bottle,
+                                            32,
+                                            layers[2],
+                                            stride=2)
+        self.layer3x3_4 = self._make_layer3(BasicBlock_Bottle,
+                                            64,
+                                            layers[3],
+                                            stride=2)
 
     def _make_layer3(self, block, planes, blocks, stride=2):
         downsample = None
@@ -106,4 +129,3 @@ class BaseNet(nn.Module):
         x = self.layer3x3_3(x)
         x = self.layer3x3_4(x)
         return x
-

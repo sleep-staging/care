@@ -14,7 +14,6 @@ __author__ = "Likith Reddy, Vamsi Kumar"
 __version__ = "1.0.0"
 __email__ = "likith012@gmail.com, vamsi81523@gmail.com"
 
-
 import numpy as np
 import copy
 import torch
@@ -22,9 +21,11 @@ import torch
 from torch.utils.data import Dataset
 from utils.augmentations import augment
 
+
 class pretext_data(Dataset):
 
-    def __init__(self, config,filepath):
+    def __init__(self, config, filepath):
+        super(pretext_data, self).__init__()
 
         self.file_path = filepath
         self.idx = np.array(range(len(self.file_path)))
@@ -37,17 +38,19 @@ class pretext_data(Dataset):
 
         path = self.file_path[index]
         data = np.load(path)
-        pos = torch.tensor(data['pos'][:, :1, :]) #(7, 2, 3000)
+        pos = torch.tensor(data["pos"][:, :1, :])  # (7, 2, 3000)
         anc = copy.deepcopy(pos)
 
         # augment
         for i in range(pos.shape[0]):
-            pos[i],anc[i] = augment(pos[i],self.config)
-        return pos[:,0,:],anc[:,0,:]
+            pos[i], anc[i] = augment(pos[i], self.config)
+        return pos[:, 0, :], anc[:, 0, :]  # (7, 3000)
+
 
 class train_data(Dataset):
 
     def __init__(self, filepath):
+        super(train_data, self).__init__()
 
         self.file_path = filepath
         self.idx = np.array(range(len(self.file_path)))
@@ -60,7 +63,8 @@ class train_data(Dataset):
         path = self.file_path[index]
         data = np.load(path)
 
-        return data['x'][:,:1,:], data['y']
+        return data["x"][:, :1, :], data["y"]
+
 
 class TuneDataset(Dataset):
     """Dataset for train and test"""
@@ -71,8 +75,8 @@ class TuneDataset(Dataset):
 
     def __getitem__(self, index):
 
-        X = self.X[index,:1,:]
-        y =  self.y[index]
+        X = self.X[index, :1, :]
+        y = self.y[index]
         return X, y
 
     def __len__(self):
@@ -82,8 +86,7 @@ class TuneDataset(Dataset):
         self.X = []
         self.y = []
         for subject in self.subjects:
-            self.X.append(subject['windows'])
-            self.y.append(subject['y'])
+            self.X.append(subject["windows"])
+            self.y.append(subject["y"])
         self.X = np.concatenate(self.X, axis=0)
         self.y = np.concatenate(self.y, axis=0)
-

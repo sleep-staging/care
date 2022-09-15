@@ -35,7 +35,7 @@ def add_noise(x: torch.Tensor, degree: float) -> torch.Tensor:
     x: torch.Tensor
         Input EEG signals.
     degree: float
-        Degree of low and high frequency noise to be added.     
+        Degree of low and high frequency noise to be added.
 
     Returns
     -------
@@ -46,8 +46,10 @@ def add_noise(x: torch.Tensor, degree: float) -> torch.Tensor:
     len_x = len(x)
     num_range = np.ptp(x) + 1e-4  # add a small number for flat signal
 
-    noise_high_frequency = degree * num_range * (2.0 * np.random.rand(len_x) - 1)
-    noise_low_frequency = degree * num_range * (2.0 * np.random.rand(len_x // 100) - 1)
+    noise_high_frequency = degree * num_range * (2.0 * np.random.rand(len_x) -
+                                                 1)
+    noise_low_frequency = degree * num_range * (
+        2.0 * np.random.rand(len_x // 100) - 1)
     x_old = np.linspace(0, 1, num=len_x // 100, endpoint=True)
     x_new = np.linspace(0, 1, num=len_x, endpoint=True)
     interpolation = interp1d(x_old, noise_low_frequency, kind="linear")
@@ -128,12 +130,11 @@ def masking(x: torch.Tensor, config) -> torch.Tensor:
     """
 
     segments = config.mask_min_points + int(
-        np.random.rand() * (config.mask_max_points - config.mask_min_points)
-    )
+        np.random.rand() * (config.mask_max_points - config.mask_min_points))
     points = np.random.randint(0, 3000 - segments)
     ret = x.detach().clone()
     for i, k in enumerate(x):
-        ret[i, points : points + segments] = 0
+        ret[i, points:points + segments] = 0
 
     return ret
 
@@ -169,12 +170,13 @@ def multi_masking(
     fin_masks = []
     segments = min_seg + int(np.random.rand() * (max_seg - min_seg))
     for seg in range(segments):
-        fin_masks.append(mask_min + int(np.random.rand() * (mask_max - mask_min)))
+        fin_masks.append(mask_min + int(np.random.rand() *
+                                        (mask_max - mask_min)))
     points = np.random.randint(0, 3000 - segments, size=segments)
     ret = x.clone()
     for i, _ in enumerate(x):
         for seg in range(segments):
-            ret[i, points[seg] : points[seg] + fin_masks[seg]] = 0
+            ret[i, points[seg]:points[seg] + fin_masks[seg]] = 0
     return ret
 
 
@@ -199,9 +201,10 @@ def flip(x: torch.Tensor) -> torch.Tensor:
         return x
 
 
-def augment(
-    x: torch.Tensor, config, masking_type: Optional[str] = None, degree: float = 3.0
-) -> Tuple[torch.Tensor, torch.Tensor]:
+def augment(x: torch.Tensor,
+            config,
+            masking_type: Optional[str] = None,
+            degree: float = 3.0) -> Tuple[torch.Tensor, torch.Tensor]:
     """Applies strong and weak kind of augmentations on the EEG Signal.
 
     Parameters
@@ -228,4 +231,3 @@ def augment(
         weak_augment = multi_masking(jitter(x, config), config)
     strong_augment = scaling(flip(x), config, degree=degree)
     return weak_augment, strong_augment
-

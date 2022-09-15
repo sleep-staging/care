@@ -139,3 +139,5 @@ __pycache__/
 logs/
 checkpoints/
 wandb/
+/*/wandb/
+/*/.ipynb_checkpoints

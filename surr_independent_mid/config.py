@@ -30,7 +30,6 @@ class Config(object):
 
         # loss
         self.temperature = 1
-        self.intra_temperature = 10
         self.use_cosine_similarity = True
 
         # optimizer

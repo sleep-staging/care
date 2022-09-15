@@ -10,6 +10,7 @@ import torch
 
 
 class Config(object):
+
     def __init__(self, wandb=None) -> None:
 
         # path
@@ -25,12 +26,11 @@ class Config(object):
         self.epoch_len = 7
 
         # time domain
-        self.tc_hidden_dim = 256
+        self.tc_hidden_dim = 128
         self.input_channels = 1
 
         # loss
         self.temperature = 1
-        self.intra_temperature = 10
         self.use_cosine_similarity = True
 
         # optimizer
