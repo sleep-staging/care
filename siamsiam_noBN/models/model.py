@@ -74,11 +74,9 @@ class projection_head(nn.Module):
         self.config = config
         
         self.projection_head = nn.Sequential(
-                    nn.Linear(input_dim, self.config.tc.hidden_dim, bias=True),
-                    nn.BatchNorm1d(self.config.tc.hidden_dim),
+                    nn.Linear(input_dim, self.config.tc_hidden_dim, bias=True),
                     nn.ReLU(inplace=True),
-                    nn.Linear(self.config.tc.hidden_dim, self.config.tc.hidden_dim, bias=True),
-                    nn.BatchNorm1d(self.config.tc.hidden_dim)
+                    nn.Linear(config.tc_hidden_dim, self.config.tc_hidden_dim, bias=True),
         )
  
     def forward(self, x):
@@ -93,10 +91,9 @@ class predictor_head(nn.Module):
         self.config = config
         
         self.projection_head = nn.Sequential(
-                    nn.Linear(self.config.tc.hidden_dim, self.config.tc.hidden_dim, bias=True),
-                    nn.BatchNorm1d(self.config.tc.hidden_dim),
+                    nn.Linear(config.tc_hidden_dim, self.config.tc_hidden_dim, bias=True),
                     nn.ReLU(inplace=True),
-                    nn.Linear(self.config.tc.hidden_dim, self.config.tc.hidden_dim, bias=True)
+                    nn.Linear(config.tc_hidden_dim, self.config.tc_hidden_dim, bias=True)
                 )
  
     def forward(self,x):
