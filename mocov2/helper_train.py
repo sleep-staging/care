@@ -199,8 +199,7 @@ class sleep_pretrain(nn.Module):
             self.on_epoch_end()
 
             # evaluation step
-#             if (epoch % 5 == 0) and (epoch > 60):
-            if (epoch % 1 == 0):
+            if (epoch % 5 == 0) and (epoch > 60):
                 f1, kappa, bal_acc, acc = self.do_kfold()
                 self.loggr.log({
                     'F1': f1,

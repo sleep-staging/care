@@ -169,7 +169,7 @@ class sleep_pretrain(nn.Module):
                 scaler.step(self.optimizer)
                 scaler.update()
 
-                outputs["loss"].append(loss.item())
+                outputs["loss"].append(loss.detach().item())
 
             epoch_loss = self.training_epoch_end(outputs)
             
@@ -193,12 +193,9 @@ class sleep_pretrain(nn.Module):
 
                 if self.max_f1 < f1:
                     chkpoint = {
-                        'eeg_model_state_dict':
-                        self.model.model.eeg_encoder.state_dict(),
-                        'best_pretrain_epoch':
-                        epoch,
-                        'f1':
-                        f1
+                        'eeg_model_state_dict': self.model.model.eeg_encoder.state_dict(),
+                        'best_pretrain_epoch': epoch,
+                        'f1': f1
                     }
                     torch.save(
                         chkpoint,

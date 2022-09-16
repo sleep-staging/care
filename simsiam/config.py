@@ -4,7 +4,7 @@ __author__ = "Likith Reddy, Vamsi Kumar"
 __version__ = "1.0.0"
 __email__ = "likith012@gmail.com, vamsi81523@gmail.com"
 
-#%%
+
 import os
 import torch
 
@@ -39,7 +39,7 @@ class Config(object):
         self.lr = 0.0003
 
         # training and evaluation
-        self.num_epoch = 200
+        self.num_epoch = 250
         self.batch_size = 128
         self.eval_batch_size = 128
         self.eval_early_stopping = 10

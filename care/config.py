@@ -10,7 +10,7 @@ import torch
 
 
 class Config(object):
-
+    
     def __init__(self, wandb=None) -> None:
 
         # path
@@ -29,7 +29,7 @@ class Config(object):
         self.input_channels = 1
 
         # loss
-        self.temperature = 0.5
+        self.temperature = 1
         self.use_cosine_similarity = True
 
         # optimizer

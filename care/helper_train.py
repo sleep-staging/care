@@ -7,7 +7,6 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 from config import Config
 from torchmetrics.functional import accuracy, cohen_kappa
 from torchmetrics.functional import f1_score as f1
-from models.model import contrast_loss, ft_loss, loss_fn
 from models.model import contrast_loss, ft_loss
 from sklearn.metrics import ConfusionMatrixDisplay, balanced_accuracy_score
 from sklearn.model_selection import KFold
@@ -31,7 +30,6 @@ class sleep_pretrain(nn.Module):
         self.name = name
         self.dataloader = dataloader
         self.loggr = wandb_logger
-        self.criterion = loss_fn().to(self.device)
         self.optimizer = torch.optim.Adam(
             self.model.parameters(),
             self.config.lr,
@@ -53,19 +51,18 @@ class sleep_pretrain(nn.Module):
         self.test_subjects = test_subjects
 
     def training_step(self, batch, batch_idx):
-        weak,strong= batch
-        weak, strong = weak.float().to(self.device), strong.float().to(self.device)
-        pred1, pred2, proj1, proj2 = self.model(weak, strong)
-        loss = self.criterion(pred1, pred2, proj1, proj2)
+        weak, strong = batch
+        weak, strong = weak.to(self.device), strong.to(self.device)
+        loss = self.model(weak, strong)
         return loss
 
     def training_epoch_end(self, outputs):
         epoch_loss = torch.hstack([torch.tensor(x)
                                    for x in outputs["loss"]]).mean()
         self.loggr.log({
-            "Epoch Loss": epoch_loss,
-            "LR": self.scheduler.optimizer.param_groups[0]["lr"],
-            "Epoch": self.current_epoch,
+                "Epoch Loss": epoch_loss,
+                "LR": self.scheduler.optimizer.param_groups[0]["lr"],
+                "Epoch": self.current_epoch,
         })
         self.scheduler.step(epoch_loss)
         return epoch_loss
@@ -98,7 +95,7 @@ class sleep_pretrain(nn.Module):
             batch_size=self.config.batch_size,
             shuffle=False,
         )
-
+        
         sleep_eval = sleep_ft(
             self.config.exp_path + "/" + self.name + ".pt",
             self.config,
@@ -115,13 +112,13 @@ class sleep_pretrain(nn.Module):
         kfold = KFold(n_splits=self.config.splits,
                       shuffle=True,
                       random_state=1234)
-
+    
         k_acc, k_f1, k_kappa, k_bal_acc = 0, 0, 0, 0
         start = time.time()
-        
+    
         i = 0
         for train_idx, test_idx in kfold.split(self.test_subjects):
-
+    
             test_subjects_train = [self.test_subjects[i] for i in train_idx]
             test_subjects_test = [self.test_subjects[i] for i in test_idx]
             test_subjects_train = [
@@ -130,7 +127,7 @@ class sleep_pretrain(nn.Module):
             test_subjects_test = [
                 rec for sub in test_subjects_test for rec in sub
             ]
-            
+
             i+=1
             print(f'Fold: {i}')
             
@@ -139,7 +136,7 @@ class sleep_pretrain(nn.Module):
             k_kappa += kappa
             k_bal_acc += bal_acc
             k_acc += acc
-      
+
         pit = time.time() - start
         print(f"Took {int(pit // 60)} min:{int(pit % 60)} secs")
 
@@ -172,7 +169,7 @@ class sleep_pretrain(nn.Module):
                 scaler.step(self.optimizer)
                 scaler.update()
 
-                outputs['loss'].append(loss.detach().item())
+                outputs["loss"].append(loss.detach().item())
 
             epoch_loss = self.training_epoch_end(outputs)
             
@@ -183,7 +180,7 @@ class sleep_pretrain(nn.Module):
             self.on_epoch_end()
 
             # evaluation step
-            if (epoch % 5 == 0) and (epoch > 40):
+            if (epoch % 5 == 0) and (epoch > 60):
                 f1, kappa, bal_acc, acc = self.do_kfold()
                 self.loggr.log({
                     'F1': f1,
@@ -196,13 +193,10 @@ class sleep_pretrain(nn.Module):
 
                 if self.max_f1 < f1:
                     chkpoint = {
-                        'eeg_model_state_dict':
-                        self.model.model.eeg_encoder.state_dict(),
-                        'best_pretrain_epoch':
-                        epoch,
-                        'f1':
-                        f1
-                    }
+                        'eeg_model_state_dict': self.model.model.eeg_encoder.state_dict(),
+                        'best_pretrain_epoch': epoch,
+                        'f1': f1
+                    }   
                     torch.save(
                         chkpoint,
                         os.path.join(self.config.exp_path,
@@ -212,7 +206,7 @@ class sleep_pretrain(nn.Module):
                         os.path.join(self.config.exp_path, self.name + f'_best.pt'))
                     self.max_f1 = f1
 
-                    
+
 
 class sleep_ft(nn.Module):
 

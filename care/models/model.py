@@ -1,4 +1,3 @@
-#%%
 import torch.nn as nn
 import torch.nn.functional as F
 import torch
@@ -6,6 +5,7 @@ import torch
 from .resnet1d import BaseNet
 from config import Config
 from typing import Type, Tuple
+from .tfr import Transformer
 
 
 class attention(nn.Module):
@@ -24,7 +24,7 @@ class attention(nn.Module):
         self.att_dim = 256
         self.W = nn.Parameter(torch.randn(256, self.att_dim))
         self.V = nn.Parameter(torch.randn(self.att_dim, 1))
-        self.scale = self.att_dim**-0.5
+        self.scale = self.att_dim ** -0.5
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = x.permute(0, 2, 1)
@@ -103,6 +103,7 @@ class projection_head(nn.Module):
 
 
 class sleep_model(nn.Module):
+
     """
     Class for the sleep model
 
@@ -124,27 +125,40 @@ class sleep_model(nn.Module):
 
         self.eeg_encoder = encoder(config)
         self.curr_pj = projection_head(config)
+        self.surr_pj = projection_head(config)
 
         self.config = config
+        self.tfmr = Transformer(256, 4, 4, 256, dropout=0.1)
 
-    def forward(
-        self, weak_dat: torch.Tensor, strong_dat: torch.Tensor
-    ):
+    def forward(self, weak_dat: torch.Tensor, strong_dat: torch.Tensor):
 
         weak_eeg_dat = weak_dat.float()
         strong_eeg_dat = strong_dat.float()
 
-        weak_curr_feats = self.eeg_encoder(
-            weak_eeg_dat[:, (self.config.epoch_len //
-                             2):(self.config.epoch_len // 2) + 1, :])
-        strong_curr_feats = self.eeg_encoder(
-            strong_eeg_dat[:, (self.config.epoch_len //
-                               2):(self.config.epoch_len // 2) + 1, :])
+        weak_surr_feats = []
+        strong_surr_feats = []
+
+        for i in range(self.config.epoch_len):
+            weak_surr_feats.append(self.eeg_encoder(weak_eeg_dat[:, i : i + 1, :]))
+            strong_surr_feats.append(self.eeg_encoder(strong_eeg_dat[:, i : i + 1, :]))
+
+        weak_curr_feats = weak_surr_feats[self.config.epoch_len // 2]
+        strong_curr_feats = strong_surr_feats[self.config.epoch_len // 2]
+
+        weak_surr_feats = torch.stack(weak_surr_feats, dim=1)
+        strong_surr_feats = torch.stack(strong_surr_feats, dim=1)
+
+        weak_surr_feats = self.tfmr(weak_surr_feats)
+        strong_surr_feats = self.tfmr(strong_surr_feats)
 
         weak_curr_feats, strong_curr_feats = self.curr_pj(
-            weak_curr_feats), self.curr_pj(strong_curr_feats)
+            weak_curr_feats
+        ), self.curr_pj(strong_curr_feats)
+        weak_surr_feats, strong_surr_feats = self.surr_pj(
+            weak_surr_feats
+        ), self.surr_pj(strong_surr_feats)
 
-        return weak_curr_feats, strong_curr_feats
+        return weak_curr_feats, weak_surr_feats, strong_curr_feats, strong_surr_feats
 
 
 class contrast_loss(nn.Module):
@@ -190,11 +204,26 @@ class contrast_loss(nn.Module):
         loss = -torch.log(pos / neg).mean()
         return loss
 
-    def forward(self, weak: torch.Tensor,
-                strong: torch.Tensor) -> Tuple[torch.Tensor]:
-        weak, strong = self.model(weak, strong)
-        loss = self.loss(weak, strong)
-        return loss
+    def forward(
+        self, weak: torch.Tensor, strong: torch.Tensor
+    ):
+
+        (
+            weak_curr_feats,
+            weak_surr_feats,
+            strong_curr_feats,
+            strong_surr_feats,
+        ) = self.model(weak, strong)
+
+        l1 = self.loss(weak_curr_feats, strong_curr_feats)
+        l2 = self.loss(weak_surr_feats, strong_surr_feats)
+
+        l3 = self.loss(weak_curr_feats, strong_surr_feats)
+        l4 = self.loss(weak_surr_feats, strong_curr_feats)
+
+        tot_loss = (l1 + l2) + self.config.lambda1 * (l3 + l4)
+
+        return tot_loss, l1.item(), l2.item()
 
 
 class ft_loss(nn.Module):
