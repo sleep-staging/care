@@ -54,18 +54,15 @@ class encoder(nn.Module):
 
     """
 
-    def __init__(self, config: Type[Config]):
+    def __init__(self):
         super(encoder, self).__init__()
-        self.time_model = BaseNet()
+        self.model = BaseNet()
         self.attention = attention()
 
     def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
-
-        time = self.time_model(x)
-
-        time_feats = self.attention(time)
-
-        return time_feats
+        x = self.model(x)
+        x = self.attention(x)
+        return x
 
 
 class projection_head(nn.Module):
@@ -97,7 +94,6 @@ class projection_head(nn.Module):
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # x = x.reshape(x.shape[0],-1)
         x = self.projection_head(x)
         return x
 
@@ -120,45 +116,70 @@ class sleep_model(nn.Module):
     """
 
     def __init__(self, config: Type[Config]):
-
         super(sleep_model, self).__init__()
 
-        self.eeg_encoder = encoder(config)
-        self.curr_pj = projection_head(config)
-        self.surr_pj = projection_head(config)
-
         self.config = config
-        self.tfmr = Transformer(256, 4, 4, 256, dropout=0.1)
+        self.top_encoder = encoder()
+        self.bot_encoder = encoder()
+        
+        for param_q, param_k in zip(self.top_encoder.parameters(),
+                                    self.bot_encoder.parameters()):
+            param_k.data.copy_(param_q.data)
+            param_k.requires_grad = False  # not update by gradient
+        
+        self.top_curr_proj = projection_head(config)
+        self.top_surr_proj = projection_head(config)
+        
+        self.bot_curr_proj = projection_head(config)
+        self.bot_surr_proj = projection_head(config)
+        
+        for param_q, param_k in zip(self.top_curr.parameters(),
+                                    self.bot_curr.parameters()):
+            param_k.data.copy_(param_q.data)
+            param_k.requires_grad = False  # not update by gradient
+            
+        for param_q, param_k in zip(self.top_surr.parameters(),
+                                    self.bot_surr.parameters()):
+            param_k.data.copy_(param_q.data)
+            param_k.requires_grad = False  # not update by gradient
 
-    def forward(self, weak_dat: torch.Tensor, strong_dat: torch.Tensor):
+        self.top_tfmr = Transformer(256, 4, 4, 256, dropout=0.1)
+        self.bot_tfmr = Transformer(256, 4, 4, 256, dropout=0.1)
+        
+        for param_q, param_k in zip(self.top_tfmr.parameters(),
+                                    self.bot_tfmr.parameters()):
+            param_k.data.copy_(param_q.data)
+            param_k.requires_grad = False  # not update by gradient
+        
 
-        weak_eeg_dat = weak_dat.float()
-        strong_eeg_dat = strong_dat.float()
+    def forward(self, top_data: torch.Tensor, bot_data: torch.Tensor):
 
-        weak_surr_feats = []
-        strong_surr_feats = []
+        top_data = top_data.float()
+        bot_data = bot_data.float()
+
+        top_surr = []
+        bot_surr = []
 
         for i in range(self.config.epoch_len):
-            weak_surr_feats.append(self.eeg_encoder(weak_eeg_dat[:, i : i + 1, :]))
-            strong_surr_feats.append(self.eeg_encoder(strong_eeg_dat[:, i : i + 1, :]))
+            top_surr.append(self.top_encoder(top_data[:, i : i + 1, :]))
+            bot_surr.append(self.bot_encoder(bot_data[:, i : i + 1, :]))
 
-        weak_curr_feats = weak_surr_feats[self.config.epoch_len // 2]
-        strong_curr_feats = strong_surr_feats[self.config.epoch_len // 2]
+        ep = torch.randint(self.config.epoch_len, (1,)).item()
+        top_curr = top_surr[ep]
+        bot_curr = bot_surr[ep]
 
-        weak_surr_feats = torch.stack(weak_surr_feats, dim=1)
-        strong_surr_feats = torch.stack(strong_surr_feats, dim=1)
+        top_surr = torch.stack(top_surr, dim=1)
+        bot_surr = torch.stack(bot_surr, dim=1)
 
-        weak_surr_feats = self.tfmr(weak_surr_feats)
-        strong_surr_feats = self.tfmr(strong_surr_feats)
+        top_surr = self.top_tfmr(top_surr)
+        bot_surr = self.bot_tfmr(bot_surr)
 
-        weak_curr_feats, strong_curr_feats = self.curr_pj(
-            weak_curr_feats
-        ), self.curr_pj(strong_curr_feats)
-        weak_surr_feats, strong_surr_feats = self.surr_pj(
-            weak_surr_feats
-        ), self.surr_pj(strong_surr_feats)
+        top_curr = self.top_curr_proj(top_curr)
+        top_surr = self.top_surr_proj(top_surr)
+        bot_curr = self.bot_curr_proj(bot_curr)
+        bot_surr = self.bot_surr_proj(bot_surr)
 
-        return weak_curr_feats, weak_surr_feats, strong_curr_feats, strong_surr_feats
+        return top_curr, top_surr, bot_curr, bot_surr
 
 
 class contrast_loss(nn.Module):
@@ -189,7 +210,7 @@ class contrast_loss(nn.Module):
 
         out = torch.cat([out_1, out_2], dim=0)  # 2B, 128
         N = out.shape[0]
-
+        
         # Full similarity matrix
         cov = torch.mm(out, out.t().contiguous())  # 2B, 2B
         sim = torch.exp(cov / self.T)  # 2B, 2B
@@ -201,7 +222,7 @@ class contrast_loss(nn.Module):
         # Positive similarity matrix
         pos = torch.exp(torch.sum(out_1 * out_2, dim=-1) / self.T)
         pos = torch.cat([pos, pos], dim=0)  # 2B
-        loss = -torch.log(pos / neg).mean()
+        loss = -torch.log(pos / neg).mean()     
         return loss
 
     def forward(
@@ -209,17 +230,17 @@ class contrast_loss(nn.Module):
     ):
 
         (
-            weak_curr_feats,
-            weak_surr_feats,
-            strong_curr_feats,
-            strong_surr_feats,
+            top_curr,
+            top_surr,
+            bot_curr,
+            bot_surr,
         ) = self.model(weak, strong)
 
-        l1 = self.loss(weak_curr_feats, strong_curr_feats)
-        l2 = self.loss(weak_surr_feats, strong_surr_feats)
+        l1 = self.loss(top_curr, bot_curr)
+        l2 = self.loss(top_surr, bot_surr)
 
-        l3 = self.loss(weak_curr_feats, strong_surr_feats)
-        l4 = self.loss(weak_surr_feats, strong_curr_feats)
+        l3 = self.loss(top_curr, bot_surr)
+        l4 = self.loss(top_surr, bot_curr)
 
         tot_loss = (l1 + l2) + self.config.lambda1 * (l3 + l4)
 

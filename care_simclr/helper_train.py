@@ -47,7 +47,6 @@ class sleep_pretrain(nn.Module):
         self.max_kappa = 0
         self.max_bal_acc = 0
         self.max_acc = 0
-        self.m = 0.9995
 
         self.test_subjects = test_subjects
 
@@ -70,7 +69,7 @@ class sleep_pretrain(nn.Module):
 
     def on_epoch_end(self):
         chkpoint = {
-            "eeg_model_state_dict": self.model.model.top_encoder.state_dict()
+            "eeg_model_state_dict": self.model.model.eeg_encoder.state_dict()
         }
         torch.save(chkpoint,
                    os.path.join(self.config.exp_path, self.name + ".pt"))
@@ -169,19 +168,7 @@ class sleep_pretrain(nn.Module):
                 scaler.scale(loss).backward()
                 scaler.step(self.optimizer)
                 scaler.update()
-                
-                for param_q, param_k in zip(self.model.model.top_encoder.parameters(), self.model.model.bot_encoder.parameters()):
-                    param_k.data = param_k.data * self.m + param_q.data * (1. - self.m)
-
-                for param_q, param_k in zip(self.model.model.top_tfmr.parameters(), self.model.model.bot_tfmr.parameters()):
-                    param_k.data = param_k.data * self.m + param_q.data * (1. - self.m)
-                
-                for param_q, param_k in zip(self.model.model.top_curr_proj.parameters(), self.model.model.bot_curr_proj.parameters()):
-                    param_k.data = param_k.data * self.m + param_q.data * (1. - self.m)
-                    
-                for param_q, param_k in zip(self.model.model.top_surr_proj.parameters(), self.model.model.bot_surr_proj.parameters()):
-                    param_k.data = param_k.data * self.m + param_q.data * (1. - self.m)
-
+                           
                 outputs["loss"].append(loss.detach().item())
 
             epoch_loss = self.training_epoch_end(outputs)
@@ -206,7 +193,7 @@ class sleep_pretrain(nn.Module):
 
                 if self.max_f1 < f1:
                     chkpoint = {
-                        'eeg_model_state_dict': self.model.model.top_encoder.state_dict(),
+                        'eeg_model_state_dict': self.model.model.eeg_encoder.state_dict(),
                         'best_pretrain_epoch': epoch,
                         'f1': f1
                     }   

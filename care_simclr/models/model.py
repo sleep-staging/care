@@ -18,7 +18,7 @@ class attention(nn.Module):
             forward pass of the attention module
 
     """
-
+    
     def __init__(self):
         super(attention, self).__init__()
         self.att_dim = 256
@@ -97,20 +97,6 @@ class projection_head(nn.Module):
         x = self.projection_head(x)
         return x
 
-class predictor_head(nn.Module):
-
-    def __init__(self, config: Type[Config]):
-        super(projection_head, self).__init__()
-        self.config = config
-        self.pred_head = nn.Sequential(
-            nn.Linear(config.tc_hidden_dim, config.tc_hidden_dim, bias=True),
-            nn.ReLU(inplace=True),
-            nn.Linear(config.tc_hidden_dim, config.tc_hidden_dim, bias=True),
-        )
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = self.pred_head(x)
-        return x
 
 class sleep_model(nn.Module):
 
@@ -132,71 +118,42 @@ class sleep_model(nn.Module):
     def __init__(self, config: Type[Config]):
         super(sleep_model, self).__init__()
 
+        self.eeg_encoder = encoder()
+        self.curr_pj = projection_head(config)
+        self.surr_pj = projection_head(config)
+
         self.config = config
-        self.top_encoder = encoder()
-        self.bot_encoder = encoder()
-        
-        for param_q, param_k in zip(self.top_encoder.parameters(),
-                                    self.bot_encoder.parameters()):
-            param_k.data.copy_(param_q.data)
-            param_k.requires_grad = False  # not update by gradient
-        
-        self.top_curr_proj = projection_head(config)
-        self.top_surr_proj = projection_head(config)
-        
-        self.bot_curr_proj = projection_head(config)
-        self.bot_surr_proj = projection_head(config)
-        
-        for param_q, param_k in zip(self.top_curr.parameters(),
-                                    self.bot_curr.parameters()):
-            param_k.data.copy_(param_q.data)
-            param_k.requires_grad = False  # not update by gradient
-            
-        for param_q, param_k in zip(self.top_surr.parameters(),
-                                    self.bot_surr.parameters()):
-            param_k.data.copy_(param_q.data)
-            param_k.requires_grad = False  # not update by gradient
-        
-        self.top_curr_pred = predictor_head(config)
-        self.top_surr_pred = predictor_head(config)
+        self.tfmr = Transformer(256, 4, 4, 256, dropout=0.1)
 
-        self.top_tfmr = Transformer(256, 4, 4, 256, dropout=0.1)
-        self.bot_tfmr = Transformer(256, 4, 4, 256, dropout=0.1)
-        
-        for param_q, param_k in zip(self.top_tfmr.parameters(),
-                                    self.bot_tfmr.parameters()):
-            param_k.data.copy_(param_q.data)
-            param_k.requires_grad = False  # not update by gradient
+    def forward(self, weak_dat: torch.Tensor, strong_dat: torch.Tensor):
 
+        weak_eeg_dat = weak_dat.float()
+        strong_eeg_dat = strong_dat.float()
 
-    def forward(self, top_data: torch.Tensor, bot_data: torch.Tensor):
-
-        top_data = top_data.float()
-        bot_data = bot_data.float()
-
-        top_surr = []
-        bot_surr = []
+        weak_surr_feats = []
+        strong_surr_feats = []
 
         for i in range(self.config.epoch_len):
-            top_surr.append(self.top_encoder(top_data[:, i : i + 1, :]))
-            bot_surr.append(self.bot_encoder(bot_data[:, i : i + 1, :]))
+            weak_surr_feats.append(self.eeg_encoder(weak_eeg_dat[:, i : i + 1, :]))
+            strong_surr_feats.append(self.eeg_encoder(strong_eeg_dat[:, i : i + 1, :]))
 
-        ep = torch.randint(self.config.epoch_len, (1,)).item()
-        top_curr = top_surr[ep]
-        bot_curr = bot_surr[ep]
+        weak_curr_feats = weak_surr_feats[self.config.epoch_len // 2]
+        strong_curr_feats = strong_surr_feats[self.config.epoch_len // 2]
 
-        top_surr = torch.stack(top_surr, dim=1)
-        bot_surr = torch.stack(bot_surr, dim=1)
+        weak_surr_feats = torch.stack(weak_surr_feats, dim=1)
+        strong_surr_feats = torch.stack(strong_surr_feats, dim=1)
 
-        top_surr = self.top_tfmr(top_surr)
-        bot_surr = self.bot_tfmr(bot_surr)
+        weak_surr_feats = self.tfmr(weak_surr_feats)
+        strong_surr_feats = self.tfmr(strong_surr_feats)
 
-        top_curr = self.top_curr_pred(self.top_curr_proj(top_curr))
-        top_surr = self.top_surr_pred(self.top_surr_proj(top_surr))
-        bot_curr = self.bot_curr_proj(bot_curr)
-        bot_surr = self.bot_surr_proj(bot_surr)
+        weak_curr_feats, strong_curr_feats = self.curr_pj(
+            weak_curr_feats
+        ), self.curr_pj(strong_curr_feats)
+        weak_surr_feats, strong_surr_feats = self.surr_pj(
+            weak_surr_feats
+        ), self.surr_pj(strong_surr_feats)
 
-        return top_curr, top_surr, bot_curr, bot_surr
+        return weak_curr_feats, weak_surr_feats, strong_curr_feats, strong_surr_feats
 
 
 class contrast_loss(nn.Module):

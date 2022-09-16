@@ -17,7 +17,7 @@ np.random.seed(SEED)
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "--name", type=str, default="care", help="Name for the saved weights"
+    "--name", type=str, default="care_simclr", help="Name for the saved weights"
 )
 parser.add_argument(
     "--data_dir", type=str, default="/scratch/sleepkfold_allsamples", help="Path to the data"

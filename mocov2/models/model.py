@@ -196,7 +196,7 @@ class contrast_loss(nn.Module):
         # labels: positive key indicators
         labels = torch.zeros(logits.shape[0],
                              dtype=torch.long).to(self.config.device)
-
+        
         # loss
         loss = F.cross_entropy(logits, labels)
 

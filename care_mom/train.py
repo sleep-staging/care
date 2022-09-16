@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 from config import Config
 from utils.utils import *
 
-SEED = 123
+SEED = 1234
 torch.manual_seed(SEED)
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
@@ -17,7 +17,7 @@ np.random.seed(SEED)
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "--name", type=str, default="surr_independent_diff_pj_cross", help="Name for the saved weights"
+    "--name", type=str, default="care_mom", help="Name for the saved weights"
 )
 parser.add_argument(
     "--data_dir", type=str, default="/scratch/sleepkfold_allsamples", help="Path to the data"
@@ -30,7 +30,7 @@ args = parser.parse_args()
 
 name = args.name
 ss_wandb = wandb.init(
-    project="surround project",
+    project="carev2",
     name=name,
     notes="curr to curr loss; surr to surr loss; curr to surr loss",
     save_code=True,
