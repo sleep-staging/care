@@ -141,3 +141,8 @@ checkpoints/
 wandb/
 /*/wandb/
 /*/.ipynb_checkpoints
+/*/*/__pycache__/
+*.pt
+/*/*.pt
+/*/*/*.pt
+/*/*/*/*.pt
