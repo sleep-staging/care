@@ -137,8 +137,9 @@ class sleep_model(nn.Module):
             weak_surr_feats.append(self.eeg_encoder(weak_eeg_dat[:, i : i + 1, :]))
             strong_surr_feats.append(self.eeg_encoder(strong_eeg_dat[:, i : i + 1, :]))
 
-        weak_curr_feats = weak_surr_feats[self.config.epoch_len // 2]
-        strong_curr_feats = strong_surr_feats[self.config.epoch_len // 2]
+        ep = torch.randint(self.config.epoch_len, (1,)).item()
+        weak_curr_feats = weak_surr_feats[ep]
+        strong_curr_feats = strong_surr_feats[ep]
 
         weak_surr_feats = torch.stack(weak_surr_feats, dim=1)
         strong_surr_feats = torch.stack(strong_surr_feats, dim=1)
