@@ -18,7 +18,7 @@ np.random.seed(SEED)
 parser = argparse.ArgumentParser()
 parser.add_argument("--name",
                     type=str,
-                    default="simclr",
+                    default="simsiam_noBN",
                     help="Name for the saved weights")
 parser.add_argument(
     "--data_dir",

@@ -59,6 +59,7 @@ class sleep_pretrain(nn.Module):
         weak,strong= batch
         weak, strong, queue = weak.float().to(self.device), strong.float().to(self.device), queue.float().to(self.device)
         loss = self.model(weak, strong, queue)
+        return loss
 
     def training_epoch_end(self, outputs):
         epoch_loss = torch.hstack([torch.tensor(x)
@@ -198,7 +199,8 @@ class sleep_pretrain(nn.Module):
             self.on_epoch_end()
 
             # evaluation step
-            if (epoch % 5 == 0) and (epoch > 60):
+#             if (epoch % 5 == 0) and (epoch > 60):
+            if (epoch % 1 == 0):
                 f1, kappa, bal_acc, acc = self.do_kfold()
                 self.loggr.log({
                     'F1': f1,
@@ -212,7 +214,7 @@ class sleep_pretrain(nn.Module):
                 if self.max_f1 < f1:
                     chkpoint = {
                         'eeg_model_state_dict':
-                        self.model.model.eeg_encoder.state_dict(),
+                        self.model.model.q_encoder.state_dict(),
                         'best_pretrain_epoch':
                         epoch,
                         'f1':
@@ -303,8 +305,6 @@ class sleep_ft(nn.Module):
                                           class_preds.cpu().numpy())
 
         if f1_sc > self.max_f1:
-            ConfusionMatrixDisplay.from_predictions(epoch_targets.cpu(),
-                                                    class_preds.cpu())
             # self.loggr.log({'Pretrain Epoch' : self.loggr.plot.confusion_matrix(probs=None,title=f'Pretrain Epoch :{self.pret_epoch+1}',
             #            y_true= epoch_targets.cpu().numpy(), preds= class_preds.numpy(),
             #            class_names= ['Wake', 'N1', 'N2', 'N3', 'REM'])})

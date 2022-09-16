@@ -74,11 +74,11 @@ class projection_head(nn.Module):
         self.config = config
         
         self.projection_head = nn.Sequential(
-                    nn.Linear(input_dim, self.config.tc.hidden_dim, bias=True),
-                    nn.BatchNorm1d(self.config.tc.hidden_dim),
+                    nn.Linear(input_dim, self.config.tc_hidden_dim, bias=True),
+                    nn.BatchNorm1d(self.config.tc_hidden_dim),
                     nn.ReLU(inplace=True),
-                    nn.Linear(self.config.tc.hidden_dim, self.config.tc.hidden_dim, bias=True),
-                    nn.BatchNorm1d(self.config.tc.hidden_dim)
+                    nn.Linear(self.config.tc_hidden_dim, self.config.tc_hidden_dim, bias=True),
+                    nn.BatchNorm1d(self.config.tc_hidden_dim)
         )
  
     def forward(self, x):
@@ -93,10 +93,10 @@ class predictor_head(nn.Module):
         self.config = config
         
         self.projection_head = nn.Sequential(
-                    nn.Linear(self.config.tc.hidden_dim, self.config.tc.hidden_dim, bias=True),
-                    nn.BatchNorm1d(self.config.tc.hidden_dim),
+                    nn.Linear(self.config.tc_hidden_dim, self.config.tc_hidden_dim, bias=True),
+                    nn.BatchNorm1d(self.config.tc_hidden_dim),
                     nn.ReLU(inplace=True),
-                    nn.Linear(self.config.tc.hidden_dim, self.config.tc.hidden_dim, bias=True)
+                    nn.Linear(self.config.tc_hidden_dim, self.config.tc_hidden_dim, bias=True)
                 )
  
     def forward(self,x):
@@ -111,6 +111,7 @@ class sleep_model(nn.Module):
         self.eeg_encoder= encoder(config)
         self.proj = projection_head(config)
         self.pred = predictor_head(config)
+        self.config = config
 
     def forward(self, weak_data, strong_data):
         weak_data= self.eeg_encoder(weak_data[:, (self.config.epoch_len // 2):(self.config.epoch_len // 2) + 1, :])

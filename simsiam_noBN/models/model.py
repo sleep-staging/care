@@ -108,6 +108,7 @@ class sleep_model(nn.Module):
         self.eeg_encoder= encoder(config)
         self.proj = projection_head(config)
         self.pred = predictor_head(config)
+        self.config = config
 
     def forward(self, weak_data, strong_data):
         weak_data= self.eeg_encoder(weak_data[:, (self.config.epoch_len // 2):(self.config.epoch_len // 2) + 1, :])

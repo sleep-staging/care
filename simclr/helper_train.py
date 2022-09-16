@@ -285,8 +285,6 @@ class sleep_ft(nn.Module):
                                           class_preds.cpu().numpy())
 
         if f1_sc > self.max_f1:
-            ConfusionMatrixDisplay.from_predictions(epoch_targets.cpu(),
-                                                    class_preds.cpu())
             # self.loggr.log({'Pretrain Epoch' : self.loggr.plot.confusion_matrix(probs=None,title=f'Pretrain Epoch :{self.pret_epoch+1}',
             #            y_true= epoch_targets.cpu().numpy(), preds= class_preds.numpy(),
             #            class_names= ['Wake', 'N1', 'N2', 'N3', 'REM'])})

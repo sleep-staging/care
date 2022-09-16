@@ -31,7 +31,7 @@ class sleep_pretrain(nn.Module):
         self.name = name
         self.dataloader = dataloader
         self.loggr = wandb_logger
-        self.criterion = loss_fn.to(self.device)
+        self.criterion = loss_fn().to(self.device)
         self.optimizer = torch.optim.Adam(
             self.model.parameters(),
             self.config.lr,
@@ -183,7 +183,8 @@ class sleep_pretrain(nn.Module):
             self.on_epoch_end()
 
             # evaluation step
-            if (epoch % 5 == 0) and (epoch > 60):
+#             if (epoch % 5 == 0) and (epoch > 60):
+            if (epoch % 1 == 0):
                 f1, kappa, bal_acc, acc = self.do_kfold()
                 self.loggr.log({
                     'F1': f1,
@@ -288,8 +289,6 @@ class sleep_ft(nn.Module):
                                           class_preds.cpu().numpy())
 
         if f1_sc > self.max_f1:
-            ConfusionMatrixDisplay.from_predictions(epoch_targets.cpu(),
-                                                    class_preds.cpu())
             # self.loggr.log({'Pretrain Epoch' : self.loggr.plot.confusion_matrix(probs=None,title=f'Pretrain Epoch :{self.pret_epoch+1}',
             #            y_true= epoch_targets.cpu().numpy(), preds= class_preds.numpy(),
             #            class_names= ['Wake', 'N1', 'N2', 'N3', 'REM'])})
