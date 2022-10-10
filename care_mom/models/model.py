@@ -207,22 +207,18 @@ class contrast_loss(nn.Module):
         # L2 normalize
         out_1 = F.normalize(out_1, p=2, dim=1)
         out_2 = F.normalize(out_2, p=2, dim=1)
-
         out = torch.cat([out_1, out_2], dim=0)  # 2B, 128
         N = out.shape[0]
-        
         # Full similarity matrix
         cov = torch.mm(out, out.t().contiguous())  # 2B, 2B
         sim = torch.exp(cov / self.T)  # 2B, 2B
-
         # Negative similarity matrix
         mask = ~torch.eye(N, device=sim.device).bool()
         neg = sim.masked_select(mask).view(N, -1).sum(dim=-1)
-
         # Positive similarity matrix
         pos = torch.exp(torch.sum(out_1 * out_2, dim=-1) / self.T)
-        pos = torch.cat([pos, pos], dim=0)  # 2B
-        loss = -torch.log(pos / neg).mean()     
+        #pos = torch.cat([pos, pos], dim=0)  # 2B
+        loss = -torch.log(pos / neg[:N//2]).mean()
         return loss
 
     def forward(
@@ -244,7 +240,7 @@ class contrast_loss(nn.Module):
 
         tot_loss = (l1 + l2) + self.config.lambda1 * (l3 + l4)
 
-        return tot_loss, l1.item(), l2.item()
+        return tot_loss
 
 
 class ft_loss(nn.Module):

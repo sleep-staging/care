@@ -222,7 +222,7 @@ class contrast_loss(nn.Module):
 
         tot_loss = (l1 + l2) + self.config.lambda1 * (l3 + l4)
 
-        return tot_loss, l1.item(), l2.item()
+        return tot_loss
 
 
 class ft_loss(nn.Module):
