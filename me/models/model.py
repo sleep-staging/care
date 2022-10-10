@@ -180,6 +180,7 @@ class contrast_loss(nn.Module):
         super(contrast_loss, self).__init__()
         self.model = sleep_model(config)
         self.T = config.temperature
+        self.config = config
 
     def loss(self, out_1: torch.Tensor, out_2: torch.Tensor):
         # L2 normalize
@@ -222,7 +223,7 @@ class contrast_loss(nn.Module):
 
         tot_loss = (l1 + l2) + self.config.lambda1 * (l3 + l4)
 
-        return tot_loss, l1.item(), l2.item()
+        return tot_loss
 
 
 class ft_loss(nn.Module):
@@ -249,7 +250,7 @@ class ft_loss(nn.Module):
 
         super(ft_loss, self).__init__()
 
-        self.eeg_encoder = encoder(config)
+        self.eeg_encoder = encoder()
         chkpoint = torch.load(chkpoint_pth, map_location=device)
         eeg_dict = chkpoint["eeg_model_state_dict"]
         self.eeg_encoder.load_state_dict(eeg_dict)
