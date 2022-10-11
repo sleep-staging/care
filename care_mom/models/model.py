@@ -133,13 +133,13 @@ class sleep_model(nn.Module):
         self.bot_curr_proj = projection_head(config)
         self.bot_surr_proj = projection_head(config)
         
-        for param_q, param_k in zip(self.top_curr.parameters(),
-                                    self.bot_curr.parameters()):
+        for param_q, param_k in zip(self.top_curr_proj.parameters(),
+                                    self.bot_curr_proj.parameters()):
             param_k.data.copy_(param_q.data)
             param_k.requires_grad = False  # not update by gradient
             
-        for param_q, param_k in zip(self.top_surr.parameters(),
-                                    self.bot_surr.parameters()):
+        for param_q, param_k in zip(self.top_surr_proj.parameters(),
+                                    self.bot_surr_proj.parameters()):
             param_k.data.copy_(param_q.data)
             param_k.requires_grad = False  # not update by gradient
 
@@ -200,6 +200,7 @@ class contrast_loss(nn.Module):
     def __init__(self, config: Type[Config]):
 
         super(contrast_loss, self).__init__()
+        self.config = config
         self.model = sleep_model(config)
         self.T = config.temperature
 
@@ -267,7 +268,7 @@ class ft_loss(nn.Module):
 
         super(ft_loss, self).__init__()
 
-        self.eeg_encoder = encoder(config)
+        self.eeg_encoder = encoder()
         chkpoint = torch.load(chkpoint_pth, map_location=device)
         eeg_dict = chkpoint["eeg_model_state_dict"]
         self.eeg_encoder.load_state_dict(eeg_dict)
