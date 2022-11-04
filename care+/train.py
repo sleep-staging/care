@@ -16,15 +16,20 @@ torch.backends.cudnn.benchmark = False
 np.random.seed(SEED)
 
 parser = argparse.ArgumentParser()
+parser.add_argument("--name",
+                    type=str,
+                    default="care+",
+                    help="Name for the saved weights")
 parser.add_argument(
-    "--name", type=str, default="care+", help="Name for the saved weights"
+    "--data_dir",
+    type=str,
+    default="/scratch/new_shhs",
+    help="Path to the data",
 )
-parser.add_argument(
-    "--data_dir", type=str, default="/scratch/sleepkfold_allsamples", help="Path to the data"
-)
-parser.add_argument(
-    "--save_path", type=str, default="./saved_weights", help="Path to save weights"
-)
+parser.add_argument("--save_path",
+                    type=str,
+                    default="./saved_weights",
+                    help="Path to save weights")
 
 args = parser.parse_args()
 
@@ -39,43 +44,51 @@ ss_wandb = wandb.init(
 config = Config(ss_wandb)
 
 config.src_path = args.data_dir
-config.exp_path = args.save_path
+config.exp_path = os.path.join(args.save_path, name)
 
-config.le_path = "/scratch/new_shhs/test"
+if not os.path.exists(config.exp_path):
+    os.makedirs(config.exp_path, exist_ok=True)
+
+config.le_path = "/scratch/sleepkfold_allsamples/test"
 
 ss_wandb.save("./config.py")
 ss_wandb.save("./trainer.py")
 ss_wandb.save("./data_preprocessing/*")
 ss_wandb.save("./models/*")
 
-
 PRETEXT_FILE = os.listdir(os.path.join(config.src_path, "pretext"))
 PRETEXT_FILE.sort(key=natural_keys)
-PRETEXT_FILE = [os.path.join(config.src_path, "pretext", f) for f in PRETEXT_FILE]
+PRETEXT_FILE = [
+    os.path.join(config.src_path, "pretext", f) for f in PRETEXT_FILE
+]
 
 TEST_FILE = os.listdir(os.path.join(config.le_path))
 TEST_FILE.sort(key=natural_keys)
 TEST_FILE = [os.path.join(config.le_path, f) for f in TEST_FILE]
 
-print(f'Number of pretext files: {len(PRETEXT_FILE)}')
-print(f'Number of test records: {len(TEST_FILE)}')
+print(f"Number of pretext files: {len(PRETEXT_FILE)}")
+print(f"Number of test records: {len(TEST_FILE)}")
 
-pretext_loader = DataLoader(pretext_data(config,PRETEXT_FILE), batch_size=config.batch_size, shuffle=True, num_workers=10)
+pretext_loader = DataLoader(
+    pretext_data(config, PRETEXT_FILE),
+    batch_size=config.batch_size,
+    shuffle=True,
+    num_workers=10,
+)
 
 test_records = [np.load(f) for f in TEST_FILE]
 test_subjects = dict()
 
 for i, rec in enumerate(test_records):
-    if rec['_description'][0] not in test_subjects.keys():
-        test_subjects[rec['_description'][0]] = [rec]
+    if rec["_description"][0] not in test_subjects.keys():
+        test_subjects[rec["_description"][0]] = [rec]
     else:
-        test_subjects[rec['_description'][0]].append(rec)
+        test_subjects[rec["_description"][0]].append(rec)
 
 test_subjects = list(test_subjects.values())
 
-model = sleep_pretrain(config, name, pretext_loader,test_subjects, ss_wandb)
+model = sleep_pretrain(config, name, pretext_loader, test_subjects, ss_wandb)
 ss_wandb.watch([model], log="all", log_freq=500)
 
 model.fit()
-
 ss_wandb.finish()

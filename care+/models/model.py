@@ -221,7 +221,7 @@ class contrast_loss(nn.Module):
         self.model = sleep_model(config)
         self.T = config.temperature
 
-    def forward(self, emb_anchor, emb_positive):
+    def loss(self, emb_anchor, emb_positive):
 
         # L2 normalize
         emb_anchor = torch.mm(torch.diag(torch.sum(torch.pow(emb_anchor, 2), axis=1) ** (-0.5)), emb_anchor)

@@ -22,7 +22,7 @@ class Config(object):
         self.mask_min_points = 50
 
         # epoch
-        self.epoch_len = 7
+        self.epoch_len = 9
 
         # time domain
         self.tc_hidden_dim = 128

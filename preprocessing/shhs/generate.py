@@ -16,9 +16,12 @@ parser.add_argument("--dir", type=str, default="/scratch/shhs_outputs",
 
 args = parser.parse_args()
 
-dire = '/scratch/new_shhs'
-data_dir = os.path.join(dire, "shhs_outputs")    #on gnode27 = "numpy_subjects"
+## ARGS
+half_window = 4
+dire = '/scratch/new_shhs_9'
+##
 
+data_dir = os.path.join(dire, "shhs_outputs")    
 if not os.path.exists(dire):
     os.makedirs(dire, exist_ok=True)
     
@@ -35,9 +38,9 @@ pretext_files = list(np.random.choice(files,264,replace=False))    #change
 
 print("pretext files: ", len(pretext_files))
 from tqdm import tqdm
-# load files
-half_window = 3
 
+
+# load files
 os.makedirs(dire+"/pretext/",exist_ok=True)
 
 cnt = 0
