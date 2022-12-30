@@ -18,12 +18,12 @@ np.random.seed(SEED)
 parser = argparse.ArgumentParser()
 parser.add_argument("--name",
                     type=str,
-                    default="simclr",
+                    default="simclr_shhs",
                     help="Name for the saved weights")
 parser.add_argument(
     "--data_dir",
     type=str,
-    default="/scratch/new_shhs",
+    default="/scratch/shhs_7",
     help="Path to the data",
 )
 parser.add_argument("--save_path",
@@ -35,13 +35,16 @@ args = parser.parse_args()
 
 name = args.name
 ss_wandb = wandb.init(
-    project="care baselines",
+    project="crl baselines",
     name=name,
-    notes="curr to curr loss",
+    notes="shhs to shhs 1 electrode",
     save_code=True,
     entity="sleep-staging",
 )
 config = Config(ss_wandb)
+
+## test path
+config.le_path = "/scratch/shhs_7/test"
 
 config.src_path = args.data_dir
 config.exp_path = os.path.join(args.save_path, name)
@@ -49,12 +52,12 @@ config.exp_path = os.path.join(args.save_path, name)
 if not os.path.exists(config.exp_path):
     os.makedirs(config.exp_path, exist_ok=True)
 
-config.le_path = "/scratch/sleepkfold_allsamples/test"
-
 ss_wandb.save("./config.py")
-ss_wandb.save("./trainer.py")
-ss_wandb.save("./data_preprocessing/*")
+ss_wandb.save("./preprocessing/*")
+ss_wandb.save("./utils/*")
 ss_wandb.save("./models/*")
+ss_wandb.save("./helper_train.py")
+ss_wandb.save("./train.py")
 
 PRETEXT_FILE = os.listdir(os.path.join(config.src_path, "pretext"))
 PRETEXT_FILE.sort(key=natural_keys)
@@ -73,7 +76,7 @@ pretext_loader = DataLoader(
     pretext_data(config, PRETEXT_FILE),
     batch_size=config.batch_size,
     shuffle=True,
-    num_workers=10,
+    num_workers=8,
 )
 
 test_records = [np.load(f) for f in TEST_FILE]

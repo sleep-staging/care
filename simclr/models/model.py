@@ -1,4 +1,3 @@
-#%%
 import torch.nn as nn
 import torch.nn.functional as F
 import torch
@@ -62,9 +61,7 @@ class encoder(nn.Module):
     def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
 
         time = self.time_model(x)
-
         time_feats = self.attention(time)
-
         return time_feats
 
 

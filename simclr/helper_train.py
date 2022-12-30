@@ -5,8 +5,8 @@ import torch.nn as nn
 import numpy as np
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from config import Config
-from torchmetrics.functional import accuracy, cohen_kappa
-from torchmetrics.functional import f1_score as f1
+from torchmetrics import Accuracy, CohenKappa, F1Score
+from torch.nn.functional import softmax
 from models.model import contrast_loss, ft_loss
 from sklearn.metrics import ConfusionMatrixDisplay, balanced_accuracy_score
 from sklearn.model_selection import KFold
@@ -22,8 +22,7 @@ class sleep_pretrain(nn.Module):
         super(sleep_pretrain, self).__init__()
         self.device = torch.device(
             "cuda" if torch.cuda.is_available() else "cpu")
-        self.model = contrast_loss(config)
-        self.model = self.model.to(self.device)
+        self.model = contrast_loss(config).to(self.device)
         self.config = config
         self.weight_decay = 3e-5
         self.batch_size = config.batch_size
@@ -152,7 +151,7 @@ class sleep_pretrain(nn.Module):
         epoch_loss = 0
         scaler = GradScaler()
         
-        for epoch in range(self.epochs):
+        for epoch in range(1, self.epochs+1):
             self.current_epoch = epoch
             outputs = {
                 "loss": [],
@@ -180,7 +179,7 @@ class sleep_pretrain(nn.Module):
             self.on_epoch_end()
 
             # evaluation step
-            if (epoch % 5 == 0) and (epoch > 60):
+            if (epoch == 1) or (epoch % 10 == 0):
                 f1, kappa, bal_acc, acc = self.do_kfold()
                 self.loggr.log({
                     'F1': f1,
@@ -190,6 +189,19 @@ class sleep_pretrain(nn.Module):
                     'Epoch': epoch
                 })
                 print(f'F1: {f1} Kappa: {kappa} B.Acc: {bal_acc} Acc: {acc}')
+
+                chkpoint_epoch = {
+                        'eeg_model_state_dict': self.model.model.eeg_encoder.state_dict(),
+                        'pretrain_epoch': epoch,
+                        'f1': f1
+                    }
+                torch.save( 
+                    chkpoint_epoch,
+                    os.path.join(self.config.exp_path,
+                                    self.name + f"__{epoch}.pt"),
+                )
+                self.loggr.save(
+                        os.path.join(self.config.exp_path, self.name + f"__{epoch}.pt"))
 
                 if self.max_f1 < f1:
                     chkpoint = {
@@ -259,36 +271,35 @@ class sleep_ft(nn.Module):
         data, y = data.float().to(self.device), y.to(self.device)
         outs = self.model(data)
         loss = self.criterion(outs, y)
-        acc = accuracy(outs, y)
+ 
         return {
             "loss": loss.detach(),
-            "acc": acc,
-            "preds": outs.detach(),
-            "target": y.detach()
-        }
+            "preds": softmax(outs.detach(), dim=1),
+            "targets": y.detach()
+        }   
 
     def validation_epoch_end(self, outputs):
 
         epoch_preds = torch.vstack([x for x in outputs["preds"]])
-        epoch_targets = torch.hstack([x for x in outputs["target"]])
+        epoch_targets = torch.hstack([x for x in outputs["targets"]])
         epoch_loss = torch.hstack([torch.tensor(x)
                                    for x in outputs['loss']]).mean()
-        epoch_acc = torch.hstack([torch.tensor(x)
-                                  for x in outputs["acc"]]).mean()
-        class_preds = epoch_preds.cpu().detach().argmax(dim=1)
-        f1_sc = f1(epoch_preds, epoch_targets, average="macro", num_classes=5)
-        kappa = cohen_kappa(epoch_preds, epoch_targets, num_classes=5)
+        
+        class_preds = epoch_preds.argmax(dim=1)
+        acc = Accuracy(task="multiclass", num_classes=5).to(self.device)(epoch_preds, epoch_targets)
+        f1_score = F1Score(task="multiclass", num_classes=5, average="macro").to(self.device)(epoch_preds, epoch_targets)
+        kappa = CohenKappa(task="multiclass", num_classes=5).to(self.device)(epoch_preds, epoch_targets)
         bal_acc = balanced_accuracy_score(epoch_targets.cpu().numpy(),
                                           class_preds.cpu().numpy())
 
-        if f1_sc > self.max_f1:
+        if f1_score > self.max_f1:
             # self.loggr.log({'Pretrain Epoch' : self.loggr.plot.confusion_matrix(probs=None,title=f'Pretrain Epoch :{self.pret_epoch+1}',
             #            y_true= epoch_targets.cpu().numpy(), preds= class_preds.numpy(),
             #            class_names= ['Wake', 'N1', 'N2', 'N3', 'REM'])})
-            self.max_f1 = f1_sc
+            self.max_f1 = f1_score
             self.max_kappa = kappa
             self.max_bal_acc = bal_acc
-            self.max_acc = epoch_acc
+            self.max_acc = acc
 
         return epoch_loss
 
@@ -301,36 +312,29 @@ class sleep_ft(nn.Module):
 
             # Training Loop
             self.model.train()
-            ft_outputs = {"loss": [], "acc": [], "preds": [], "target": []}
-            outputs = {'loss': []}
+            ft_outputs = {"loss": [], "acc": [], "preds": [], "targets": []}
 
-            for ft_batch_idx, ft_batch in enumerate(self.train_ft_dl):
-                loss = self.training_step(ft_batch, ft_batch_idx)
+            for batch_idx, batch in enumerate(self.train_ft_dl):
+                loss = self.training_step(batch, batch_idx)
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()
 
-                outputs['loss'].append(loss.item())
-                loss = torch.hstack([torch.tensor(x)
-                                     for x in outputs['loss']]).mean()
-
             # Validation Loop
             self.model.eval()
             with torch.no_grad():
-                for ft_batch_idx, ft_batch in enumerate(self.valid_ft_dl):
-                    dct = self.validation_step(ft_batch, ft_batch_idx)
-                    loss, acc, preds, target = (
+                for batch_idx, batch in enumerate(self.valid_ft_dl):
+                    dct = self.validation_step(batch, batch_idx)
+                    loss, preds, targets = (
                         dct["loss"],
-                        dct["acc"],
                         dct["preds"],
-                        dct["target"],
+                        dct["targets"],
                     )
                     ft_outputs["loss"].append(loss.item())
-                    ft_outputs["acc"].append(acc.item())
                     ft_outputs["preds"].append(preds)
-                    ft_outputs["target"].append(target)
+                    ft_outputs["targets"].append(targets)
 
-                val_loss = self.validation_epoch_end(ft_outputs)
+            val_loss = self.validation_epoch_end(ft_outputs)
 
             if val_loss + 0.001 < self.best_loss:
                 self.best_loss = val_loss

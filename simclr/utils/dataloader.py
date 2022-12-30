@@ -38,32 +38,13 @@ class pretext_data(Dataset):
 
         path = self.file_path[index]
         data = np.load(path)
-        pos = torch.tensor(data["pos"][:, :1, :])  # (7, 2, 3000)
+        pos = torch.tensor(data["pos"][:, :1, :])  # (7, 1, 3000)
         anc = copy.deepcopy(pos)
 
         # augment
         for i in range(pos.shape[0]):
             pos[i], anc[i] = augment(pos[i], self.config)
         return pos[:, 0, :], anc[:, 0, :]  # (7, 3000)
-
-
-class train_data(Dataset):
-
-    def __init__(self, filepath):
-        super(train_data, self).__init__()
-
-        self.file_path = filepath
-        self.idx = np.array(range(len(self.file_path)))
-
-    def __len__(self):
-        return len(self.file_path)
-
-    def __getitem__(self, index):
-
-        path = self.file_path[index]
-        data = np.load(path)
-
-        return data["x"][:, :1, :], data["y"]
 
 
 class TuneDataset(Dataset):
